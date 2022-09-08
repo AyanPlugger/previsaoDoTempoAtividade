@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Flatlist, FlatList} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import Tempo from './components/tempo';
+
 import Api from './components/api';
 
 
@@ -29,36 +30,52 @@ export default function App() {
 
 
     async function carregaCity(){
-        const response = await Api.get('weather?array_limit=1&fields=only_results,temp,city_name,forecast,max,min,description,date&key=da251ba8&city_name='+inputCity+','+uf);
-        setClima(response.data.forecast[0]);
+        const response = await Api.get('weather?array_limit=10&fields=only_results,temp,city_name,forecast,max,min,description,date&key=da251ba8&city_name='+inputCity+','+uf);
+        setClima(response.data.forecast);
         setClima2(response.data);
 
     };
   return (
     <View style={styles.container}>
        <View style={styles.bloco}>
-      <Text style={styles.textheader}>Tempo</Text>
-      <TextInput 
-          placeholder='Cidade..'
-          style={styles.input}
-          onChangeText={(value)=>setInputCity(value)}
-        />
+          <Text style={styles.textheader}>Tempo</Text>
+            <TextInput 
+                placeholder='Cidade..'
+                style={styles.input}
+                onChangeText={(value)=>setInputCity(value)}
+              />
 
-  <Picker style={styles.picker}
-    selectedValue={uf}
-    onValueChange={(itemValue, itemIndex) =>
-      setUf(itemValue)
-    }>
-      {listUf.map((a, b) => ( 
-            <Picker.Item value={a.sigla} label={a.nome} />
-        ))}
-    </Picker>
+              <Picker style={styles.picker}
+                selectedValue={uf}
+                onValueChange={(itemValue, itemIndex) =>
+                  setUf(itemValue)
+                }>
+                  {listUf.map((a, b) => ( 
+                        <Picker.Item value={a.sigla} label={a.nome} />
+                    ))}
+                </Picker>
 
-      <TouchableOpacity style={styles.btn} onPress={carregaCity}>
-       <Text style={styles.btnText}>Buscar</Text>
-   </TouchableOpacity>
-   </View>
-   <Tempo data={clima} data2={clima2}/>
+              <TouchableOpacity style={styles.btn} onPress={carregaCity}>
+              <Text style={styles.btnText}>Buscar</Text>
+            </TouchableOpacity>
+        </View>
+     {/*
+     <Tempo data={clima} data2={clima2}/>
+      */}
+      <FlatList 
+        data={clima}
+        data2={clima2}
+        renderItem={({item})=>{
+          return(
+            <View>
+              <Text>Data: {item.date}</Text>
+              <Text>Max: {item.max}</Text>
+              <Text>Min: {item.min}</Text>
+              <Text>Desc: {item.description}</Text>
+            </View>  
+          );
+        }}
+      />
     </View>
   );
   }
